@@ -1,8 +1,24 @@
+{-# Language FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs      #-}
 
-module Scrabble.Tile where
+module Scrabble.Tile (Tile, points) where
+
+import qualified Data.Text as T
+import qualified Data.Char as C
+import           Servant
 
 data Tile = A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z
     deriving (Eq, Show, Read)
+
+
+instance FromHttpApiData [Tile] where
+    parseUrlPiece :: T.Text -> Either T.Text [Tile]
+    parseUrlPiece = sequence . fmap parseTile . T.unpack . T.toUpper
+
+parseTile :: Char -> Either T.Text Tile
+parseTile c | C.isAlpha c = Right . read $ [c]
+parseTile c               = Left . T.pack $ "cannot parse " ++ [c] ++ " as tile."
+
 
 points :: Tile -> Int
 points t = case t of

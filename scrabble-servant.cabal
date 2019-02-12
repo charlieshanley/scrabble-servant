@@ -19,10 +19,10 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
 library
-  exposed-modules:     Scrabble.Servant.Main
+  exposed-modules:     Scrabble.Servant.API
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.12 && <4.13, servant-server
+  build-depends:       base >=4.12 && <4.13, servant-server, servant-lucid
   hs-source-dirs:      Scrabble
   default-language:    Haskell2010
   ghc-options:         -Wall
