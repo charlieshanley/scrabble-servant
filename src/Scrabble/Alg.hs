@@ -1,14 +1,12 @@
 
 module Scrabble.Alg () where
 
--- import Scrabble.Tile
+import Scrabble.Tiles
 
--- -- TODO return what, Vector of Text?
--- perms :: [Tile] -> [Text]
--- perms (t:ts) = undefined
+-- TODO return what data structure, Vector Text?
+permutations :: Tiles -> [Text]
+permutations = undefined
 
--- perms' :: [a] -> [[a]]
--- perms' (a:as) = 
-
-
+isWord :: Text -> IO Bool
+isWord = undefined
 
