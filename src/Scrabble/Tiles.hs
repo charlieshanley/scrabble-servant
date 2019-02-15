@@ -3,22 +3,29 @@
 {-# Language GeneralizedNewtypeDeriving #-}
 {-# Language DeriveGeneric              #-}
 
-module Scrabble.Tiles (Tiles, tiles, nTiles, Word, word, Points, score) where
+module Scrabble.Tiles
+    ( Tiles, tiles, nTiles, subseqPermutations
+    , Word, word
+    , Points, score
+    ) where
 
-import           Prelude                    hiding (Word, fail)
+import           Prelude hiding (Word, fail)
 import           Control.Monad.Fail
 import           GHC.Generics
-import qualified Data.Char          as C
-import qualified Data.Text          as T
-import           Data.Text                  (Text)
+import qualified Data.Char as C
+import qualified Data.Text as T
+import           Data.Text (Text)
+import qualified Data.Set as S
+import           Data.Set (Set)
+import qualified Data.List as L
 import           Servant
 import           Data.Aeson (ToJSON)
 import           Lucid      (ToHtml)
 
 
 newtype Tiles  = Tiles  Text
-newtype Word   = Word   Text deriving (Generic)
-newtype Points = Points Int  deriving (Generic, Num)
+newtype Word   = Word   Text deriving (Generic, ToHtml, Eq, Ord)
+newtype Points = Points Int  deriving (Generic, Show, Num)
 
 ----------
 -- Conversions to and from text
@@ -40,6 +47,15 @@ validText t                     = fail   $ T.unpack t ++ " contains nonalpha cha
 -- TODO this is orphan instance. What to do?
 instance MonadFail (Either Text) where
     fail = Left . T.pack
+
+----------
+-- utlities for algorithm
+
+subseqPermutations :: Tiles -> Set Word
+subseqPermutations (Tiles t) =
+    S.fromList $ fmap (Word . T.pack) .
+    (>>= L.permutations) . L.subsequences $ T.unpack t 
+
 
 
 ----------
@@ -82,8 +98,6 @@ score (Word t) = T.foldl' add 0 t
 
 instance ToJSON Points
 instance ToJSON Word
-instance ToHtml Word
-instance ToHtml Points
 
 instance FromHttpApiData Tiles where
     parseUrlPiece :: Text -> Either Text Tiles

@@ -20,9 +20,9 @@ extra-source-files:  CHANGELOG.md
 
 library
   exposed-modules:     Scrabble.Servant.API
-  other-modules:       Scrabble.Tiles, Scrabble.Results, Scrabble.Alg
+  other-modules:       Scrabble.Tiles, Scrabble.Results
   build-depends:       base >=4.12 && <4.13, servant-server, servant-lucid, text,
-                       lucid, aeson, warp
+                       lucid, aeson, warp, containers
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Wall

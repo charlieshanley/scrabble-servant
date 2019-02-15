@@ -7,6 +7,8 @@ import           Data.Aeson (ToJSON)
 import           GHC.Generics
 import           Lucid
 import           Data.Monoid ((<>))
+import           Data.Set (Set)
+import qualified Data.Set as S
 import           Scrabble.Tiles
 
 data Result = Result { wrd :: Word, pts :: Points }
@@ -23,10 +25,12 @@ instance ToHtml [Result] where
 
 instance ToHtml Result where
     toHtml r = tr_ $ do
-        td_ . toHtml $ wrd r
-        td_ . toHtml $ pts r
+        td_ . toHtml        $ wrd r
+        td_ . toHtml . show $ pts r
     toHtmlRaw = toHtml
 
 
-results :: Tiles -> [Result]
-results = undefined
+results :: Set Word -> Tiles -> [Result]
+results dictionary t = present <$> S.toList myWords
+    where myWords = subseqPermutations t `S.intersection` dictionary
+          present w = Result w (score w)
