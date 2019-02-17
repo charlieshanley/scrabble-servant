@@ -28,9 +28,11 @@ import           Lucid      (ToHtml)
 
 newtype Tiles  = Tiles  Text
 newtype Word   = Word   Text deriving (Generic, ToHtml, Eq, Ord)
-newtype Points = Points Int  deriving (Generic, Show, Num)
+newtype Points = Points Int  deriving (Generic, Num)
 
 -- Tiles and Words should always be lowercase, so as to simplify equality
+
+instance Show Points where show (Points i) = show i
 
 ----------
 -- Conversions to and from text
