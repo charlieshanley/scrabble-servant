@@ -1,4 +1,5 @@
 {-# Language FlexibleInstances          #-}
+{-# Language FlexibleContexts           #-}
 {-# Language InstanceSigs               #-}
 {-# Language GeneralizedNewtypeDeriving #-}
 {-# Language DeriveGeneric              #-}
@@ -12,7 +13,7 @@ module Scrabble.Tiles
     ) where
 
 import           Prelude hiding (Word, fail)
-import           Control.Monad.Fail
+import           Control.Monad.Except
 import           GHC.Generics
 import qualified Data.Char as C
 import qualified Data.Text as T
@@ -32,23 +33,19 @@ newtype Points = Points Int  deriving (Generic, Show, Num)
 ----------
 -- Conversions to and from text
 
-tiles :: MonadFail m => Text -> m Tiles
+tiles :: Text -> Either Text Tiles
 tiles = fmap Tiles . validText
 
 nTiles :: Tiles -> Int
 nTiles (Tiles t) = T.length t
 
-word :: MonadFail m => Text -> m Word
+word :: Text -> Either Text Word
 word = fmap Word . validText
 
-validText :: MonadFail m => Text -> m Text
-validText t | T.all C.isAlpha t = return $ T.toUpper t
-validText t                     = fail   $ T.unpack t ++ " contains nonalpha char"
+validText :: Text -> Either Text Text
+validText t | T.all C.isAlpha t = return     $ T.toUpper t
+validText t                     = throwError $ t <> " contains nonalpha char"
 
-
--- TODO this is orphan instance. What to do?
-instance MonadFail (Either Text) where
-    fail = Left . T.pack
 
 ----------
 -- utlities for algorithm
