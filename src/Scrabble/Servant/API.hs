@@ -26,6 +26,6 @@ app dict = serve api (server dict)
 
 scrabbleServant :: IO ()
 scrabbleServant = do
-    dictionary <- undefined
+    let dictionary = testDictionary
     Warp.run 8081 $ app dictionary
 

@@ -2,11 +2,13 @@
 {-# Language InstanceSigs               #-}
 {-# Language GeneralizedNewtypeDeriving #-}
 {-# Language DeriveGeneric              #-}
+{-# Language OverloadedStrings          #-}
 
 module Scrabble.Tiles
     ( Tiles, tiles, nTiles, subseqPermutations
     , Word, word
     , Points, score
+    , testDictionary
     ) where
 
 import           Prelude hiding (Word, fail)
@@ -103,3 +105,14 @@ instance FromHttpApiData Tiles where
     parseUrlPiece :: Text -> Either Text Tiles
     parseUrlPiece = tiles
 
+----------
+-- temp for test
+
+testDictionary :: Set Word
+testDictionary = S.fromList $ Word <$>
+    [ "a"
+    , "b"
+    , "c"
+    , "d"
+    , "e"
+    ]
