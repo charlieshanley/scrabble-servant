@@ -1,8 +1,12 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings, FlexibleInstances #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts  #-}
 
-module Scrabble.Results ( Result, results ) where
+module Scrabble.Results ( Result, Dictionary, results ) where
 
 import           Prelude hiding (Word)
+import           Control.Monad.Reader
 import           Data.Aeson (ToJSON)
 import           GHC.Generics
 import           Lucid
@@ -13,6 +17,9 @@ import           Scrabble.Tiles
 
 data Result = Result { wrd :: Word, pts :: Points }
     deriving Generic
+
+type Dictionary = Set Word
+-- Should be lower case
 
 instance ToJSON Result
 
@@ -30,7 +37,10 @@ instance ToHtml Result where
     toHtmlRaw = toHtml
 
 
-results :: Set Word -> Tiles -> [Result]
-results dictionary t = present <$> S.toList myWords
-    where myWords = subseqPermutations t `S.intersection` dictionary
-          present w = Result w (score w)
+-- results :: Tiles -> Reader Dictionary [Result]
+results :: MonadReader Dictionary m => Tiles -> m [Result]
+results t = do
+    dictionary <- ask
+    let myWords = subseqPermutations t `S.intersection` dictionary
+    let package w = Result w (score w)
+    return $ package <$> S.toList myWords

@@ -30,6 +30,8 @@ newtype Tiles  = Tiles  Text
 newtype Word   = Word   Text deriving (Generic, ToHtml, Eq, Ord)
 newtype Points = Points Int  deriving (Generic, Show, Num)
 
+-- Tiles and Words should always be lowercase, so as to simplify equality
+
 ----------
 -- Conversions to and from text
 
@@ -43,7 +45,7 @@ word :: Text -> Either Text Word
 word = fmap Word . validText
 
 validText :: Text -> Either Text Text
-validText t | T.all C.isAlpha t = return     $ T.toUpper t
+validText t | T.all C.isAlpha t = return     $ T.toLower t
 validText t                     = throwError $ t <> " contains nonalpha char"
 
 
@@ -68,29 +70,35 @@ score (Word t) = T.foldl' add 0 t
 
           points :: Char -> Points
           points c = case c of
-              'Q' -> 10
-              'Z' -> 10
+                  -- 12345678910
+              'a' -> 1
+              'b' ->   3
+              'c' ->   3
+              'd' ->  2
+              'e' -> 1
+              'f' ->    4
+              'g' ->  2
+              'h' ->    4
+              'i' -> 1
+              'j' ->        8
+              'k' ->     5
+              'l' -> 1
+              'm' ->   3
+              'n' -> 1
+              'o' -> 1
+              'p' ->   3
+              'q' ->          10
+              'r' -> 1
+              's' -> 1
+              't' -> 1
+              'u' -> 1
+              'v' ->    4
+              'w' ->    4
+              'x' ->        8
+              'y' ->    4
+              'z' ->          10
 
-              'J' -> 8
-              'X' -> 8
-
-              'K' -> 5
-
-              'F' -> 4
-              'H' -> 4
-              'V' -> 4
-              'W' -> 4
-              'Y' -> 4
-
-              'B' -> 3
-              'C' -> 3
-              'M' -> 3
-              'P' -> 3
-
-              'D' -> 2
-              'G' -> 2
-
-              _ -> 1
+              _ -> error "Bad programmer! You wrote a partial function!"
 
 ----------
 -- Instances for Servant
@@ -112,4 +120,17 @@ testDictionary = S.fromList $ Word <$>
     , "c"
     , "d"
     , "e"
+    , "f"
+    , "g"
+    , "h"
+    , "i"
+    , "j"
+    , "k"
+    , "l"
+    , "m"
+    , "n"
+    , "o"
+    , "p"
+    , "q"
+    , "r"
     ]
