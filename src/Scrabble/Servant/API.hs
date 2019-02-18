@@ -2,8 +2,11 @@
 
 module Scrabble.Servant.API where
 
-import           Prelude hiding (Word)
+import           Prelude hiding (Word, readFile)
 import           Control.Monad.Reader
+import qualified Data.Text as T
+import qualified Data.Set as S
+import           Data.Text.IO (readFile)
 import           Servant
 import           Servant.HTML.Lucid
 import qualified Network.Wai.Handler.Warp as Warp
@@ -24,8 +27,11 @@ api = Proxy
 app :: Dictionary -> Application
 app dict = serve api $ hoistServer api (flip runReaderT dict) server
 
+readDictionary :: IO Dictionary
+readDictionary = S.fromList . fmap wordNoCheck . T.lines <$> readFile "wordlist.txt"
+
 scrabbleServant :: IO ()
 scrabbleServant = do
-    let dictionary = testDictionary
+    dictionary <- readDictionary
     Warp.run 8081 $ app dictionary
 

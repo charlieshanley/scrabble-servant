@@ -7,7 +7,7 @@
 
 module Scrabble.Tiles
     ( Tiles, tiles, nTiles, subseqPermutations
-    , Word, word
+    , Word, word, wordNoCheck
     , Points, score
     , testDictionary
     ) where
@@ -45,6 +45,9 @@ nTiles (Tiles t) = T.length t
 
 word :: Text -> Either Text Word
 word = fmap Word . validText
+
+wordNoCheck :: Text -> Word
+wordNoCheck = Word
 
 validText :: Text -> Either Text Text
 validText t | T.all C.isAlpha t = return     $ T.toLower t
