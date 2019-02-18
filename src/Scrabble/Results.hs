@@ -13,6 +13,7 @@ import           Lucid
 import           Data.Monoid ((<>))
 import           Data.Set (Set)
 import qualified Data.Set as S
+import           Data.List (sortBy)
 import           Scrabble.Tiles
 
 data Result = Result { wrd :: Word, pts :: Points }
@@ -40,7 +41,7 @@ instance ToHtml Result where
 -- results :: Tiles -> Reader Dictionary [Result]
 results :: MonadReader Dictionary m => Tiles -> m [Result]
 results t = do
-    dictionary <- ask
-    let myWords = subseqPermutations t `S.intersection` dictionary
-    let package w = Result w (score w)
-    return $ package <$> S.toList myWords
+    myWords <- S.intersection (subseqPermutations t) <$> ask
+    let resList = fmap (\w -> Result w (score w)) $ S.toList myWords
+    let descending (Result _ p1) (Result _ p2) = compare (negate p1) (negate p2)
+    return $ sortBy descending resList

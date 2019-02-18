@@ -9,7 +9,6 @@ module Scrabble.Tiles
     ( Tiles, tiles, nTiles, subseqPermutations
     , Word, word, wordNoCheck
     , Points, score
-    , testDictionary
     ) where
 
 import           Prelude hiding (Word, fail)
@@ -28,7 +27,7 @@ import           Lucid      (ToHtml)
 
 newtype Tiles  = Tiles  Text
 newtype Word   = Word   Text deriving (Generic, ToHtml, Eq, Ord)
-newtype Points = Points Int  deriving (Generic, Num)
+newtype Points = Points Int  deriving (Generic, Eq, Ord, Num)
 
 -- Tiles and Words should always be lowercase, so as to simplify equality
 
@@ -114,28 +113,3 @@ instance ToJSON Word
 instance FromHttpApiData Tiles where
     parseUrlPiece :: Text -> Either Text Tiles
     parseUrlPiece = tiles
-
-----------
--- temp for test
-
-testDictionary :: Set Word
-testDictionary = S.fromList $ Word <$>
-    [ "a"
-    , "b"
-    , "c"
-    , "d"
-    , "e"
-    , "f"
-    , "g"
-    , "h"
-    , "i"
-    , "j"
-    , "k"
-    , "l"
-    , "m"
-    , "n"
-    , "o"
-    , "p"
-    , "q"
-    , "r"
-    ]
