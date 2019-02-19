@@ -1,4 +1,4 @@
-{ mkDerivation, aeson, base, containers, lucid, servant-lucid
+{ mkDerivation, aeson, base, containers, lucid, mtl, servant-lucid
 , servant-server, stdenv, text, warp
 }:
 mkDerivation {
@@ -8,7 +8,8 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    aeson base containers lucid servant-lucid servant-server text warp
+    aeson base containers lucid mtl servant-lucid servant-server text
+    warp
   ];
   executableHaskellDepends = [ base ];
   homepage = "https://github.com/charlieshanley/scrabble-servant";
