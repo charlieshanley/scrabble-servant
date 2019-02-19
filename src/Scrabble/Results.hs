@@ -41,7 +41,8 @@ instance ToHtml Result where
 -- results :: Tiles -> Reader Dictionary [Result]
 results :: MonadReader Dictionary m => Tiles -> m [Result]
 results t = do
-    myWords <- S.intersection (subseqPermutations t) <$> ask
-    let resList = fmap (\w -> Result w (score w)) $ S.toList myWords
-    let descending (Result _ p1) (Result _ p2) = compare (negate p1) (negate p2)
+    dictionary <- ask
+    let myWords = S.toList $ subseqPermutations t `S.intersection` dictionary
+    let resList = (\w -> Result w (score w)) <$> myWords
+    let descending (Result _ p1) (Result _ p2) = compare p2 p1
     return $ sortBy descending resList
