@@ -26,13 +26,17 @@ import           Lucid      (ToHtml)
 
 
 newtype Tiles        = Tiles { untiles :: Text }
-newtype Word         = Word   Text deriving (Generic, ToHtml, Eq, Ord)
-newtype Points       = Points Int  deriving (Generic, Eq, Ord, Num)
+newtype Word         = Word   Text deriving (Generic, ToHtml, ToJSON, Eq, Ord)
+newtype Points       = Points Int  deriving (Generic, ToJSON, Eq, Ord, Num)
 type    Subsequences = [String]
 
 -- Tiles and Words should always be lowercase, so as to simplify equality
 
 instance Show Points where show (Points i) = show i
+
+instance FromHttpApiData Tiles where
+    parseUrlPiece :: Text -> Either Text Tiles
+    parseUrlPiece = tiles
 
 ----------
 -- Conversions to and from text
@@ -105,12 +109,3 @@ score (Word t) = T.foldl' add 0 t
 
               _ -> error "Bad programmer! You wrote a partial function!"
 
-----------
--- Instances for Servant
-
-instance ToJSON Points
-instance ToJSON Word
-
-instance FromHttpApiData Tiles where
-    parseUrlPiece :: Text -> Either Text Tiles
-    parseUrlPiece = tiles

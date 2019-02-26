@@ -1,4 +1,7 @@
-{-# Language DataKinds, TypeOperators, OverloadedStrings #-}
+{-# Language DataKinds         #-}
+{-# Language TypeOperators     #-}
+{-# Language OverloadedStrings #-}
+{-# Language FlexibleContexts  #-}
 
 module Scrabble.Servant.API where
 
@@ -13,13 +16,23 @@ import qualified Network.Wai.Handler.Warp as Warp
 import           Scrabble.Tiles
 import           Scrabble.Results
 
-type API = Capture "tiles" Tiles :> Get '[JSON, HTML] Results
+type GETResults r = Capture "tiles" Tiles :> Get '[JSON, HTML] r
+
+type API = ( "canmake"       :> GETResults CanMake       )
+      :<|> ( "canalmostmake" :> GETResults CanAlmostMake )
 
 type AppM = ReaderT Dictionary Handler
 
-server :: Tiles -> AppM Results
-server ts | nTiles ts > 7 = throwError err400 { errBody = "more than 7 tiles" }
-server ts                 = results ts
+server :: ServerT API AppM
+server = serveCanMake :<|> serveCanAlmostMake
+    where
+        serveCanMake ts | nTiles ts > 8 = err400body "more than 8 tiles"
+        serveCanMake ts                 = canMake ts
+
+        serveCanAlmostMake ts | nTiles ts > 7 = err400body "more than 7 tiles"
+        serveCanAlmostMake ts                 = canAlmostMake ts
+
+        err400body body = throwError err400 { errBody = body }
 
 api :: Proxy API
 api = Proxy

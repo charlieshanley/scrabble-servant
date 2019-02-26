@@ -3,7 +3,11 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts  #-}
 
-module Scrabble.Results ( Results, Dictionary, results ) where
+module Scrabble.Results 
+    ( CanMake,       canMake
+    , CanAlmostMake, canAlmostMake
+    , Dictionary
+    ) where
 
 import           Prelude hiding (Word)
 import           Control.Monad.Reader
@@ -16,56 +20,54 @@ import qualified Data.Set as S
 import qualified Data.List as L
 import           Scrabble.Tiles
 
-data Results = Results { missing0 :: [Play], missing1 :: [Play] }
-    deriving ( Generic )
+newtype CanMake       = CanMake       [Play] deriving (Generic)
+newtype CanAlmostMake = CanAlmostMake [Play] deriving (Generic)
 
-data Play = Play { wrd :: Word, pts :: Points }
-    deriving ( Generic )
+data Play = Play { wrd :: Word, pts :: Points } deriving ( Generic )
 
 type Dictionary   = Set Word -- Should be lower case
 
+----------
+-- content type instances
+
 instance ToJSON Play
-instance ToJSON Results
+instance ToJSON CanMake
+instance ToJSON CanAlmostMake
 
 instance ToHtml Play where
     toHtml (Play w p) = tr_ $ (td_ $ toHtml w) <> (td_ $ toHtml $ show p)
     toHtmlRaw = toHtml
 
-instance ToHtml Results where
-    toHtml (Results miss0 miss1) = table0 <> table1
-        where table0 = makeTable "You can make:"             miss0
-              table1 = makeTable "You are missing one from:" miss1
-              makeTable capt plays = table_ $ do
-                  _ <- caption_ capt
-                  tr_ $ th_ "word" <> th_ "points"
-                  foldMap toHtml plays
+instance ToHtml CanMake where
+    toHtml (CanMake plays) = makeTable "You can make:" plays
     toHtmlRaw = toHtml
 
+instance ToHtml CanAlmostMake where
+    toHtml (CanAlmostMake plays) = makeTable "You are missing letter one from:" plays
+    toHtmlRaw = toHtml
 
--- results :: MonadReader Dictionary m => Tiles -> m Results
--- results t = do
---     dictionary <- ask
---     let myWords = S.toList $ subseqPermutations t `S.intersection` dictionary
---     let resList = (\w -> Result w (score w)) <$> myWords
---     let descending (Result _ p1) (Result _ p2) = compare p2 p1
---     return $ L.sortBy descending resList
+makeTable :: Monad m => HtmlT m a -> [Play] -> HtmlT m ()
+makeTable capt plays = table_ $ do
+    _ <- caption_ capt
+    tr_ $ th_ "word" <> th_ "points"
+    foldMap toHtml plays
 
-results :: MonadReader Dictionary m => Tiles -> m Results
-results ts = do
-    dict <- ask
-    let subseqs      = subsequences ts
-    let subseqsPlus1 = ['a'..'z'] >>= \c -> (c :) <$> subseqs
-    let miss0 = legalPlays dict subseqs
-    let miss1 = take 20 $ legalPlays dict subseqsPlus1
-    return $ Results miss0 miss1
+----------
+-- get results for tiles
 
-legalPlays :: Dictionary -> Subsequences -> [Play]
-legalPlays dict s = L.sortBy descending plays
+canMake :: MonadReader Dictionary m => Tiles -> m CanMake
+canMake ts = CanMake . legalPlays (subsequences ts) <$> ask
+
+canAlmostMake :: MonadReader Dictionary m => Tiles -> m CanAlmostMake
+canAlmostMake ts = CanAlmostMake . legalPlays subsequencesPlusOne <$> ask
+    where subsequencesPlusOne = ['a'..'z'] >>= \c -> (c:) <$> subsequences ts
+              
+legalPlays :: Subsequences -> Dictionary -> [Play]
+legalPlays s dict = L.sortBy descending plays
     where 
         legalWords = S.intersection (permutations s) dict
-        plays      = fmap play . S.toList $ legalWords
-        play :: Word -> Play
-        play w = Play w (score w)
-        descending :: Play -> Play -> Ordering
+        plays = fmap play . S.toList $ legalWords
         descending (Play _ p1) (Play _ p2) = compare p2 p1
 
+play :: Word -> Play
+play w = Play w (score w)
