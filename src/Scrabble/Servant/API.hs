@@ -18,19 +18,15 @@ import           Scrabble.Results
 
 type GETResults r = Capture "tiles" Tiles :> Get '[JSON, HTML] r
 
-type API = ( "canmake"       :> GETResults CanMake       )
-      :<|> ( "canalmostmake" :> GETResults CanAlmostMake )
+type API = "canmake" :> GETResults CanMake
 
 type AppM = ReaderT Dictionary Handler
 
 server :: ServerT API AppM
-server = serveCanMake :<|> serveCanAlmostMake
+server = serveCanMake
     where
         serveCanMake ts | nTiles ts > 8 = err400body "more than 8 tiles"
         serveCanMake ts                 = canMake ts
-
-        serveCanAlmostMake ts | nTiles ts > 7 = err400body "more than 7 tiles"
-        serveCanAlmostMake ts                 = canAlmostMake ts
 
         err400body body = throwError err400 { errBody = body }
 

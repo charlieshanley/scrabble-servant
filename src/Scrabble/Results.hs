@@ -59,8 +59,8 @@ canMake :: MonadReader Dictionary m => Tiles -> m CanMake
 canMake ts = CanMake . legalPlays (subsequences ts) <$> ask
 
 canAlmostMake :: MonadReader Dictionary m => Tiles -> m CanAlmostMake
-canAlmostMake ts = CanAlmostMake . legalPlays subsequencesPlusOne <$> ask
-    where subsequencesPlusOne = ['a'..'z'] >>= \c -> (c:) <$> subsequences ts
+canAlmostMake ts = CanAlmostMake . legalPlays subseqsPlusOne <$> ask
+    where subseqsPlusOne = ['a'..'z'] >>= \c -> (c:) <$> subsequences ts
               
 legalPlays :: Subsequences -> Dictionary -> [Play]
 legalPlays s dict = L.sortBy descending plays
