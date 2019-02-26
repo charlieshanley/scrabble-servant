@@ -46,5 +46,5 @@ readDictionary = S.fromList . fmap unsafeWord . T.lines <$> readFile "wordlist.t
 scrabbleServant :: IO ()
 scrabbleServant = do
     dictionary <- readDictionary
-    Warp.run 8081 $ app dictionary
+    Warp.run 80 $ app dictionary
 

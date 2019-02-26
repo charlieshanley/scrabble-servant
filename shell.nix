@@ -1,1 +1,1 @@
-(import ./release.nix).env
+(import ./default.nix).env
