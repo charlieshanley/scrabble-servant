@@ -1,7 +1,8 @@
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# Language GeneralizedNewtypeDeriving #-}
 
 module Scrabble.Results 
     ( CanMake,       canMake
@@ -20,19 +21,16 @@ import qualified Data.Set as S
 import qualified Data.List as L
 import           Scrabble.Tiles
 
-newtype CanMake       = CanMake       [Play] deriving (Generic)
-newtype CanAlmostMake = CanAlmostMake [Play] deriving (Generic)
+newtype CanMake       = CanMake       [Play] deriving (Generic, ToJSON)
+newtype CanAlmostMake = CanAlmostMake [Play] deriving (Generic, ToJSON)
 
-data Play = Play { wrd :: Word, pts :: Points } deriving ( Generic )
+data Play = Play { wrd :: Word, pts :: Points } deriving (Generic)
+instance ToJSON Play
 
 type Dictionary   = Set Word -- Should be lower case
 
 ----------
 -- content type instances
-
-instance ToJSON Play
-instance ToJSON CanMake
-instance ToJSON CanAlmostMake
 
 instance ToHtml Play where
     toHtml (Play w p) = tr_ $ (td_ $ toHtml w) <> (td_ $ toHtml $ show p)

@@ -26,7 +26,7 @@ import           Lucid      (ToHtml)
 
 
 newtype Tiles        = Tiles { untiles :: Text }
-newtype Word         = Word   Text deriving (Generic, ToHtml, ToJSON, Eq, Ord)
+newtype Word         = Word   Text deriving (Generic, ToJSON, ToHtml, Eq, Ord)
 newtype Points       = Points Int  deriving (Generic, ToJSON, Eq, Ord, Num)
 type    Subsequences = [String]
 
