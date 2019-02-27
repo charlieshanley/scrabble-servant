@@ -13,6 +13,6 @@ mkDerivation {
   ];
   executableHaskellDepends = [ base ];
   homepage = "https://github.com/charlieshanley/scrabble-servant";
-  description = "API to suggest scrabble words that use your letters";
+  description = "Web API for the words that can be made with a set of letters";
   license = stdenv.lib.licenses.bsd3;
 }

@@ -5,7 +5,7 @@ cabal-version:       >=1.10
 
 name:                scrabble-servant
 version:             0.1.0.0
-synopsis:            API to suggest scrabble words that use your letters
+synopsis:            Web API for the words that can be made with a set of letters
 -- description:
 homepage:            https://github.com/charlieshanley/scrabble-servant
 -- bug-reports:
